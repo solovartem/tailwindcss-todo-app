@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo</title>
+    <link rel="stylesheet" href="build/css/styles.css">
+</head>
+<body class="bg-gray-200">
+    <div class="px-2 sm:m-12">
+        <div class="flex flex-col items-stretch mt-16 bg-gray-100">
+            <div class="sm:p-12 w-auto">
+                <div class="w-auto text-2xl bg-gray-200 p-4 m-2 rounded-lg">
+                    <div id="todo">
+                        <!-- <div class="flex justify-between p-1" data-id="1" >                            
+                            <label class="block task">
+                                <input type="checkbox" value="1" class="form-checkbox">    
+                                <span class="ml-4">Lorem ipsum lo</span>     
+                            </label>
+                            <button value="1" class="px-2 bg-gray-300 text-gray-400 outline-none hover:bg-red-300 hover:text-red-900 rounded rounded-l-none text-sm">delete</button>
+                        </div>
+                        <div class="flex justify-between p-1" data-id="2">                            
+                            <label class="block task">
+                                <input type="checkbox" value="2" class="form-checkbox">    
+                                <span class="ml-4">Lorem ipsum lo</span>     
+                            </label>
+                            <button value="2" class="px-2 bg-gray-300 text-gray-400 outline-none hover:bg-red-300 hover:text-red-900 rounded rounded-l-none text-sm">delete</button>
+                        </div>
+                        <div class="flex justify-between p-1" data-id="3">                            
+                            <label class="block task">
+                                <input type="checkbox" value="3" class="form-checkbox">    
+                                <span class="ml-4">Lorem ipsum lo</span>     
+                            </label>
+                            <button value="3" class="px-2 bg-gray-300 text-gray-400 outline-none hover:bg-red-300 hover:text-red-900 rounded rounded-l-none text-sm">delete</button>
+                        </div>
+                        <div class="flex justify-between p-1" data-id="4">                            
+                            <label class="block task">
+                                <input type="checkbox" value="4" class="form-checkbox">    
+                                <span class="ml-4">Lorem ipsum lo</span>     
+                            </label>
+                            <button value="4" class="px-2 bg-gray-300 text-gray-400 outline-none hover:bg-red-300 hover:text-red-900 rounded rounded-l-none text-sm">delete</button>
+                        </div> -->
+                    </div>
+                    <div class="flex justify-center flex-col sm:flex-row mt-2">
+                        <input type="text" id="new-task-txt" placeholder="new task" class="form-input border-none outline-none bg-gray-300 hover:bg-gray-400 mb-1 sm:mb-0">
+                        <button id="add-new-task-btn" class="px-2 bg-green-200 text-green-900 outline-none hover:bg-green-300 rounded rounded-l-none text-xl">Add new Task</button>
+                    </div>
+                </div>
+                <div class="mt-4 bg-gray-200 text-2xl p-4 m-2 rounded-lg" id="completed">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function deleteTodoEvent(e) {
+            let task_id = parseInt(e.target.value);
+            let task = document.querySelector(`div[data-id='${task_id}']`);
+            task.remove();
+        }
+        function taskCheckboxClick(e) {
+            let task_id = parseInt(e.target.value);
+            if(e.target.checked == true) {
+                let task = document.querySelector(`#todo>div[data-id='${task_id}']`);
+                let completed_tasks = document.getElementById('completed');
+                completed_tasks.innerHTML += task.outerHTML;
+                task.remove();
+                let complete_checkboxs = document.querySelectorAll(`#completed>div>label>input`);
+                complete_checkboxs.forEach(function(e){e.checked=true});
+                let complete_span = document.querySelector(`#completed>div[data-id="${task_id}"]>label>span`);
+                complete_span.innerHTML = `
+                <del>${complete_span.innerHTML}</del>
+                `;
+
+                let all_delete_btns = document.querySelectorAll('#completed>div>button');
+                all_delete_btns.forEach(function(e) { e.addEventListener('click', deleteTodoEvent); });
+            }
+            else{
+                let task = document.querySelector(`#completed>div[data-id='${task_id}']`);
+                let completed_tasks = document.getElementById('todo');
+                completed_tasks.innerHTML += task.outerHTML;
+                let complete_span = document.querySelector(`#todo>div[data-id="${task_id}"]>label>span`);
+                complete_span.innerHTML = complete_span.getElementsByTagName('del')[0].innerHTML;
+                task.remove();
+
+                let all_delete_btns = document.querySelectorAll('#todo>div>button');
+                all_delete_btns.forEach(function(e) { e.addEventListener('click', deleteTodoEvent); });
+
+            }
+            let all_task_checkbox = document.querySelectorAll('input[type="checkbox"]');
+            all_task_checkbox.forEach(function(e) {e.addEventListener('click', taskCheckboxClick)});
+        }
+        window.addEventListener('load', function(){
+            let all_delete_btns = document.querySelectorAll('#todo>div>button');
+            all_delete_btns.forEach(function(e) { e.addEventListener('click', deleteTodoEvent); });
+            let all_task_checkbox = document.querySelectorAll('#todo>div>label>input[type="checkbox"]');
+            all_task_checkbox.forEach(function(e) {e.addEventListener('click', taskCheckboxClick)});
+            let add_new_task_btn = document.getElementById('add-new-task-btn');
+            add_new_task_btn.addEventListener('click', function(){
+                let new_task_textbox =  document.getElementById('new-task-txt');
+                let new_task = new_task_textbox.value;
+                if(new_task.length == 0) {
+                    alert('Task size must be more than 1 character.');
+                    return;
+                }
+                let todo_list = document.getElementById('todo');
+                let all_tasks = todo_list.querySelectorAll('div[data-id]');
+                let all_tasks_ids = [0]
+                all_tasks.forEach(function(e) {
+                    all_tasks_ids.push(parseInt(e.getAttribute('data-id')));
+                });
+                let new_task_id = Math.max(...all_tasks_ids) + 1;
+                todo_list.innerHTML += `<div class="flex justify-between p-1" data-id="${new_task_id}">                            
+                    <label class="block task">
+                        <input type="checkbox" value="${new_task_id}" class="form-checkbox">    
+                        <span class="ml-4">${new_task}</span>     
+                    </label>
+                    <button value="${new_task_id}" class="px-2 bg-gray-300 text-gray-400 outline-none hover:bg-red-300 hover:text-red-900 rounded rounded-l-none text-sm">delete</button>
+                </div>`
+                new_task_textbox.value = "";
+                let all_delete_btns = document.querySelectorAll('#todo>div>button');
+                all_delete_btns.forEach(function(e) { e.removeEventListener('click', deleteTodoEvent); });
+                all_delete_btns.forEach(function(e) { e.addEventListener('click', deleteTodoEvent); });
+                let all_task_checkbox = document.querySelectorAll('#todo>div>label>input[type="checkbox"]');
+                all_task_checkbox.forEach(function(e) {e.removeEventListener('click', taskCheckboxClick)});
+                all_task_checkbox.forEach(function(e) {e.addEventListener('click', taskCheckboxClick)});
+
+    
+            });
+        });
+    </script>
+</body>
+</html>
